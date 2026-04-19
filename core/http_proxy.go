@@ -14,6 +14,7 @@ import (
 	"crypto/rc4"
 	"crypto/sha256"
 	"crypto/tls"
+	utls "github.com/refraction-networking/utls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -1541,6 +1542,7 @@ func (p *HttpProxy) TLSConfigFromCA() func(host string, ctx *goproxy.ProxyCtx) (
 		}
 
 		tls_cfg := &tls.Config{}
+		_ = utls.HelloChrome_Auto
 		if !p.developer {
 
 			tls_cfg.GetCertificate = p.crt_db.magic.GetCertificate
