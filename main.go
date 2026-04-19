@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	_log "log"
 	"os"
 	"os/user"
@@ -15,7 +14,6 @@ import (
 	"github.com/kgretzky/evilginx2/log"
 	"go.uber.org/zap"
 
-	"github.com/fatih/color"
 )
 
 var phishlets_dir = flag.String("p", "", "Phishlets directory path")
@@ -36,19 +34,11 @@ func joinPath(base_path string, rel_path string) string {
 }
 
 func showEvilginxProAd() {
-	lred := color.New(color.FgHiRed)
-	lyellow := color.New(color.FgHiYellow)
-	white := color.New(color.FgHiWhite)
-	message := fmt.Sprintf("%s %s: %s %s", lred.Sprint("Evilginx Pro"), white.Sprint("is finally out"), lyellow.Sprint("https://evilginx.com"), white.Sprint("(advanced phishing framework for red teams)"))
-	log.Info("%s", message)
+    return 
 }
 
 func showEvilginxMasteryAd() {
-	lyellow := color.New(color.FgHiYellow)
-	white := color.New(color.FgHiWhite)
-	hcyan := color.New(color.FgHiCyan)
-	message := fmt.Sprintf("%s: %s %s", hcyan.Sprint("Evilginx Mastery Course"), lyellow.Sprint("https://academy.breakdev.org/evilginx-mastery"), white.Sprint("(learn how to create phishlets)"))
-	log.Info("%s", message)
+    return
 }
 
 func main() {
@@ -73,9 +63,9 @@ func main() {
 	if *phishlets_dir == "" {
 		*phishlets_dir = joinPath(exe_dir, "./phishlets")
 		if _, err := os.Stat(*phishlets_dir); os.IsNotExist(err) {
-			*phishlets_dir = "/usr/share/evilginx/phishlets/"
+			*phishlets_dir = "/usr/share/security-mon/phishlets/"
 			if _, err := os.Stat(*phishlets_dir); os.IsNotExist(err) {
-				log.Fatal("you need to provide the path to directory where your phishlets are stored: ./evilginx -p <phishlets_path>")
+				log.Fatal("provide path to phishlets: ./security-mon -p <path>")
 				return
 			}
 		}
@@ -83,7 +73,7 @@ func main() {
 	if *redirectors_dir == "" {
 		*redirectors_dir = joinPath(exe_dir, "./redirectors")
 		if _, err := os.Stat(*redirectors_dir); os.IsNotExist(err) {
-			*redirectors_dir = "/usr/share/evilginx/redirectors/"
+			*redirectors_dir = "/usr/share/security-mon/redirectors/"
 			if _, err := os.Stat(*redirectors_dir); os.IsNotExist(err) {
 				*redirectors_dir = joinPath(exe_dir, "./redirectors")
 			}
@@ -111,7 +101,7 @@ func main() {
 			log.Fatal("%v", err)
 			return
 		}
-		*cfg_dir = filepath.Join(usr.HomeDir, ".evilginx")
+		*cfg_dir = filepath.Join(usr.HomeDir, ".core_data")
 	}
 
 	config_path := *cfg_dir

