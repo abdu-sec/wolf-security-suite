@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wolf Security Suite</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#010409;color:#e6edf3;font-family:'Segoe UI',sans-serif;min-height:100vh}
+.header{background:linear-gradient(90deg,#0d1117,#161b22,#0d1117);border-bottom:1px solid #39ff1433;padding:16px 32px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:16px}
+.logo-icon{font-size:32px;filter:drop-shadow(0 0 8px #39ff14)}
+.logo-text{font-size:18px;font-weight:800;color:#39ff14;letter-spacing:2px;font-family:monospace}
+.logo-sub{font-size:11px;color:#8b949e;letter-spacing:1px}
+.status{display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:#39ff14;box-shadow:0 0 6px #39ff14}
+.nav{display:flex;gap:0;border-bottom:1px solid #21262d;background:#0d1117;padding:0 32px}
+.nav button{padding:12px 20px;background:none;border:none;color:#8b949e;border-bottom:2px solid transparent;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-family:monospace;transition:all .2s}
+.nav button.active{color:#39ff14;border-bottom-color:#39ff14}
+.nav button:hover{color:#39ff14}
+.content{padding:24px 32px;max-width:1200px;margin:0 auto}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.stat{text-align:center;padding:12px 16px;background:#0d111766;border-radius:8px;border:1px solid #21262d;min-width:100;flex:1}
+.stat-val{font-size:28px;font-weight:800;font-family:monospace}
+.stat-lbl{font-size:10px;color:#8b949e;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.cards{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+.card{background:linear-gradient(145deg,#0d1117,#161b22);border:1px solid #39ff1422;border-radius:12px;padding:20px 24px;flex:1;min-width:280;box-shadow:0 4px 24px #39ff1408}
+.card-title{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.card-title span{font-size:13px;font-weight:700;color:#39ff14;letter-spacing:1.5px;text-transform:uppercase;font-family:monospace}
+table{width:100%;border-collapse:collapse}
+th{padding:8px 12px;font-size:10px;color:#8b949e;text-align:left;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #21262d}
+td{padding:10px 12px;font-size:12px;font-family:monospace;border-bottom:1px solid #21262d11}
+.badge{font-size:10px;padding:3px 10px;border-radius:12px;font-weight:700}
+.badge-green{background:#39ff1422;color:#39ff14;border:1px solid #39ff1444}
+.badge-red{background:#f8514922;color:#f85149;border:1px solid #f8514944}
+.badge-purple{background:#bc8cff22;color:#bc8cff}
+.info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #21262d44}
+.info-row .lbl{font-size:11px;color:#8b949e}
+.info-row .val{font-size:11px;color:#e6edf3;font-family:monospace}
+.log-entry{display:flex;gap:12px;padding:6px 8px;font-size:11px;font-family:monospace;border-bottom:1px solid #21262d22}
+.log-time{color:#8b949e;min-width:70px}
+.log-lvl{min-width:35px;font-weight:700}
+.mod-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0}
+.mod-check{color:#39ff14}
+.footer{border-top:1px solid #21262d;padding:16px 32px;display:flex;justify-content:space-between;background:#0d1117;margin-top:24px;font-size:10px;color:#8b949e;font-family:monospace}
+.hidden{display:none}
+.center-big{text-align:center;margin-bottom:16px}
+.center-big .num{font-size:48px;font-weight:800;color:#39ff14;font-family:monospace}
+.center-big .txt{font-size:12px;color:#8b949e;text-transform:uppercase;letter-spacing:2px}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">
+<div class="logo-icon">🐺</div>
+<div><div class="logo-text">WOLF SECURITY SUITE</div><div class="logo-sub">Advanced Security Research Edition v1.0.5 — @Abdo_CMU</div></div>
+</div>
+<div class="status"><span id="clock" style="font-size:14px;font-family:monospace;color:#39ff14"></span><div class="dot"></div><span style="font-size:11px;color:#39ff14">ACTIVE</span></div>
+</div>
+<div class="nav">
+<button class="active" onclick="showTab('dashboard',this)">◉ Dashboard</button>
+<button onclick="showTab('sessions',this)">◎ Sessions</button>
+<button onclick="showTab('lures',this)">◈ Lures</button>
+<button onclick="showTab('mods',this)">◆ Modifications</button>
+<button onclick="showTab('logs',this)">◇ Live Logs</button>
+</div>
+<div class="content">
+<!-- DASHBOARD -->
+<div id="tab-dashboard">
+<div class="stats">
+<div class="stat"><div class="stat-val" style="color:#39ff14">47</div><div class="stat-lbl">Total Visitors</div></div>
+<div class="stat"><div class="stat-val" style="color:#58a6ff">1</div><div class="stat-lbl">Active Sessions</div></div>
+<div class="stat"><div class="stat-val" style="color:#39ff14">11</div><div class="stat-lbl">Tokens Captured</div></div>
+<div class="stat"><div class="stat-val" style="color:#d29922">42</div><div class="stat-lbl">Blocked IPs</div></div>
+<div class="stat"><div class="stat-val" style="color:#bc8cff">31</div><div class="stat-lbl">Modifications</div></div>
+</div>
+<div class="cards">
+<div class="card"><div class="card-title">🎯 <span>Phishlets</span></div>
+<table><thead><tr><th>Name</th><th>Status</th><th>Hostname</th><th>Visitors</th></tr></thead>
+<tbody><tr><td>google</td><td><span class="badge badge-green">ENABLED</span></td><td style="color:#8b949e">hope-relief-center.site</td><td style="color:#58a6ff">47</td></tr>
+<tr><td>example</td><td><span class="badge badge-red">DISABLED</span></td><td style="color:#8b949e">—</td><td style="color:#58a6ff">0</td></tr></tbody></table></div>
+<div class="card" style="border-color:#58a6ff22"><div class="card-title">🏗️ <span style="color:#58a6ff">Infrastructure</span></div>
+<div class="info-row"><span class="lbl">Server</span><span class="val">104.131.100.177</span></div>
+<div class="info-row"><span class="lbl">Domain</span><span class="val">hope-relief-center.site</span></div>
+<div class="info-row"><span class="lbl">CDN</span><span class="val">Cloudflare (SSL Full)</span></div>
+<div class="info-row"><span class="lbl">Redirector</span><span class="val">Turnstile CAPTCHA</span></div>
+<div class="info-row"><span class="lbl">TLS Library</span><span class="val">uTLS (Chrome Auto)</span></div>
+<div class="info-row"><span class="lbl">Server Header</span><span class="val">Apache/2.4.41</span></div>
+<div class="info-row"><span class="lbl">Cookie Pattern</span><span class="val">_ga_XXXXXX</span></div>
+<div class="info-row"><span class="lbl">Blacklist</span><span class="val">unauth (42 IPs)</span></div></div></div></div>
+<!-- SESSIONS -->
+<div id="tab-sessions" class="hidden"><div class="card"><div class="card-title">🔐 <span>Captured Sessions</span></div>
+<table><thead><tr><th>ID</th><th>Phishlet</th><th>Username</th><th>Tokens</th><th>Time</th><th>User Agent</th></tr></thead>
+<tbody><tr><td style="color:#39ff14">#0</td><td>google</td><td style="color:#58a6ff">target@gmail.com</td><td><span class="badge badge-green">11 tokens</span></td><td style="color:#8b949e">19:51:45</td><td style="color:#8b949e">Chrome/147.0 Win</td></tr></tbody></table></div></div>
+<!-- LURES -->
+<div id="tab-lures" class="hidden"><div class="card"><div class="card-title">🎣 <span>Active Lures</span></div>
+<table><thead><tr><th>ID</th><th>Path</th><th>Redirector</th><th>Redirect URL</th><th>Status</th></tr></thead>
+<tbody><tr><td style="color:#39ff14">#0</td><td style="color:#58a6ff">/HWAqGNXC</td><td style="color:#8b949e">—</td><td style="color:#8b949e;font-size:11px">https://mail.google.com</td><td><span class="badge badge-green">ACTIVE</span></td></tr>
+<tr><td style="color:#39ff14">#1</td><td style="color:#58a6ff">/pdflKxcS</td><td style="color:#8b949e">—</td><td style="color:#8b949e">—</td><td><span class="badge badge-green">ACTIVE</span></td></tr>
+<tr><td style="color:#39ff14">#2</td><td style="color:#58a6ff">/hCFUDAjG</td><td><span class="badge badge-purple">turnstile</span></td><td style="color:#8b949e">—</td><td><span class="badge badge-green">ACTIVE</span></td></tr></tbody></table></div></div>
+<!-- MODS -->
+<div id="tab-mods" class="hidden">
+<div class="center-big"><div class="num">31</div><div class="txt">Total Source Code Modifications</div></div>
+<div class="cards">
+<div class="card" style="border-color:#f8514922"><div class="card-title">🛡️ <span style="color:#f85149">IOC Removal (14)</span></div>
+<div class="mod-item"><span class="mod-check">✓</span> X-Evilginx Header removed</div>
+<div class="mod-item"><span class="mod-check">✓</span> CA Certificates (×3 locations)</div>
+<div class="mod-item"><span class="mod-check">✓</span> Rick Roll URL → google.com</div>
+<div class="mod-item"><span class="mod-check">✓</span> JS Path /s/ → /assets/</div>
+<div class="mod-item"><span class="mod-check">✓</span> HOME_DIR .evilginx → .core_data</div>
+<div class="mod-item"><span class="mod-check">✓</span> Binary: security-mon</div>
+<div class="mod-item"><span class="mod-check">✓</span> All paths + messages cleaned</div>
+<div class="mod-item"><span class="mod-check">✓</span> Startup ads removed</div></div>
+<div class="card" style="border-color:#58a6ff22"><div class="card-title">🌐 <span style="color:#58a6ff">Network Stealth (7)</span></div>
+<div class="mod-item"><span class="mod-check">✓</span> Cookie: _ga_ pattern</div>
+<div class="mod-item"><span class="mod-check">✓</span> Server: Apache/2.4.41</div>
+<div class="mod-item"><span class="mod-check">✓</span> uTLS Chrome library</div>
+<div class="mod-item"><span class="mod-check">✓</span> Cloudflare CDN</div>
+<div class="mod-item"><span class="mod-check">✓</span> Turnstile CAPTCHA</div>
+<div class="mod-item"><span class="mod-check">✓</span> Safe Browsing rewrite</div>
+<div class="mod-item"><span class="mod-check">✓</span> Wolf Security Gate</div></div>
+<div class="card" style="border-color:#bc8cff22"><div class="card-title">🎨 <span style="color:#bc8cff">Identity (5)</span></div>
+<div class="mod-item"><span class="mod-check">✓</span> VERSION 1.0.5</div>
+<div class="mod-item"><span class="mod-check">✓</span> Banner: @Abdo_CMU</div>
+<div class="mod-item"><span class="mod-check">✓</span> Professional README</div>
+<div class="mod-item"><span class="mod-check">✓</span> Clean CHANGELOG</div>
+<div class="mod-item"><span class="mod-check">✓</span> Build scripts updated</div></div></div></div>
+<!-- LOGS -->
+<div id="tab-logs" class="hidden"><div class="card"><div class="card-title">📡 <span>Live System Logs</span></div><div id="log-container"></div></div></div>
+</div>
+<div class="footer"><span>Wolf Security Suite v1.0.5 • 31 Modifications • 80+ Pages Research</span><span>Built by <span style="color:#39ff14">@Abdo_CMU</span> • Carnegie Mellon University</span></div>
+<script>
+function showTab(id,btn){document.querySelectorAll('[id^=tab-]').forEach(t=>t.classList.add('hidden'));document.getElementById('tab-'+id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})},1000);
+const logs=[["imp","[google] new visitor arrived: Chrome/147.0 (213.6.147.149)"],["inf","[google] landing URL: /pdflKxcS"],["+++","tokens intercepted: /ServiceLogin"],["war","blacklisted IP: 91.92.241.197"],["inf","Turnstile challenge served"],["war","scanner blocked: 104.252.191.96"],["inf","Session cookie rotated"],["imp","[google] new visitor: Firefox/139.0"]];
+const colors={"+++":"#39ff14","imp":"#58a6ff","inf":"#8b949e","war":"#d29922"};
+let lc=document.getElementById('log-container');
+function addLog(){const l=logs[Math.floor(Math.random()*logs.length)];const t=new Date().toLocaleTimeString('en-US',{hour12:false});const d=document.createElement('div');d.className='log-entry';d.innerHTML='<span class="log-time">['+t+']</span><span class="log-lvl" style="color:'+colors[l[0]]+'"">['+l[0]+']</span><span>'+l[1]+'</span>';lc.prepend(d);if(lc.children.length>20)lc.removeChild(lc.lastChild)}
+for(let i=0;i<8;i++)addLog();setInterval(addLog,3000);
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});
+</script>
+</body></html>
